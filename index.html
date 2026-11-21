@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RésaPro - Prestations & Rendez-vous</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .service-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
+        }
+
+        .service-info p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .price-badge {
+            background-color: #eff6ff;
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            ring: 2px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .summary-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .summary-box p {
+            margin: 4px 0;
+        }
+
+        .instructions {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .instructions h4 {
+            margin: 0 0 8px 0;
+            color: #92400e;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>RésaPro</h1>
+        <p class="subtitle">Prestations & Rendez-vous</p>
+    </header>
+
+    <!-- Écran 1 : Catalogue des services -->
+    <div id="catalog-section" class="card">
+        <h2>Nos Prestations</h2>
+        <div id="services-list"></div>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+        <button id="next-btn" class="btn" disabled>Continuer</button>
+    </div>
+
+    <!-- Écran 2 : Formulaire de réservation -->
+    <div id="booking-section" class="card hidden">
+        <h2>Finaliser la réservation</h2>
+        <p id="selected-service-summary" style="font-weight: 600; color: var(--primary);"></p>
+        
+        <div class="form-group">
+            <label for="client-name">Votre Nom Complet</label>
+            <input type="text" id="client-name" placeholder="Ex: Jean Koné" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="client-phone">Votre Numéro Mobile Money</label>
+            <input type="tel" id="client-phone" placeholder="Ex: 0700000000" required>
+        </div>
+
+        <div id="submit-btn-container">
+            <button id="submit-btn" class="btn" onclick="validateBooking()">Valider et Afficher les instructions</button>
+        </div>
+    </div>
+
+    <!-- Écran 3 : Instructions de paiement manuel -->
+    <div id="instructions-section" class="card hidden">
+        <h2>Instructions de paiement manuel</h2>
+        <div class="summary-box">
+            <p><strong>Service :</strong> <span id="summary-service-name"></span></p>
+            <p><strong>Total à régler :</strong> <span id="summary-total-price"></span> FCFA</p>
+        </div>
+        
+        <p>Veuillez vous rendre sur le menu de votre opérateur (MTN Momo ou Moov Money) :</p>
+        <ol>
+            <li>Choisissez "Envoyer de l'argent".</li>
+            <li>Indiquez le numéro marchand : <strong id="merchant-number">########</strong></li>
+            <li>Indiquez le montant exact avec votre code secret et confirmez la transaction.</li>
+        </ol>
+
+        <p style="margin-top: 20px;">Une fois le transfert effectué, vous recevrez la validation et nos SMS de confirmation.</p>
+        
+        <button class="btn" onclick="resetApp()">Faire une autre réservation</button>
+    </div>
+</div>
+
+<script>
+    // Configuration des services
+    const services = [
+        { id: 1, name: "Coiffure Tresses Premium", price: 10000, duration: "2h" },
+        { id: 2, name: "Soin Visage Éclat", price: 15000, duration: "1h" },
+        { id: 3, name: "Consultation Business", price: 20000, duration: "1h" }
+    ];
+
+    let selectedService = null;
+
+    // Initialisation de la page
+    function init() {
+        const listElement = document.getElementById('services-list');
+        listElement.innerHTML = '';
+        
+        services.forEach(service => {
+            const item = document.createElement('div');
+            item.className = 'service-item';
+            item.innerHTML = `
+                <div class="service-info">
+                    <h3>${service.name}</h3>
+                    <p>Durée estimée : ${service.duration}</p>
+                </div>
+                <div class="price-badge">${service.price.toLocaleString()} FCFA</div>
+            `;
+            item.onclick = () => selectService(service, item);
+            listElement.appendChild(item);
+        });
+    }
+
+    // Sélection d'un service
+    function selectService(service, element) {
+        document.querySelectorAll('.service-item').forEach(el => el.style.backgroundColor = 'transparent');
+        element.style.backgroundColor = '#eff6ff';
+        selectedService = service;
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    // Passage du Catalogue au Formulaire
+    document.getElementById('next-btn').onclick = function() {
+        if (!selectedService) return;
+        
+        document.getElementById('catalog-section').classList.add('hidden');
+        document.getElementById('booking-section').classList.remove('hidden');
+        document.getElementById('selected-service-summary').innerText = `Sélectionné : ${selectedService.name} (${selectedService.price.toLocaleString()} FCFA)`;
+    };
+
+    // Validation du formulaire
+    function validateBooking() {
+        const name = document.getElementById('client-name').value.trim();
+        const phone = document.getElementById('client-phone').value.trim();
+
+        if (!name || !phone) {
+            alert("Veuillez remplir tous les champs pour continuer.");
+            return;
+        }
+
+        // Affichage des instructions
+        document.getElementById('booking-section').classList.add('hidden');
+        document.getElementById('instructions-section').classList.remove('hidden');
+        
+        document.getElementById('summary-service-name').innerText = selectedService.name;
+        document.getElementById('summary-total-price').innerText = selectedService.price.toLocaleString();
+    }
+
+    // Réinitialisation de l'application
+    function resetApp() {
+        selectedService = null;
+        document.getElementById('client-name').value = '';
+        document.getElementById('client-phone').value = '';
+        document.getElementById('next-btn').disabled = true;
+        document.getElementById('instructions-section').classList.add('hidden');
+        document.getElementById('catalog-section').classList.remove('hidden');
+        init();
+    }
+
+    // Lancer l'application au chargement
+    init();
+</script>
+
+</body>
+  </html>
+  
